@@ -20,7 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+DEBUG = not os.path.exists(os.path.join(BASE_DIR, 'env-prod'))
 
 ALLOWED_HOSTS = []
 
@@ -121,5 +122,15 @@ STATIC_URL = '/static/'
 
 # 1 second.
 MINIMUM_CHECKIN_MICROSECONDS = 1000000
+
+MEMCACHED_CACHE = 'django.core.cache.backends.memcached.MemcachedCache'
+MEMORY_CACHE = 'django.core.cache.backends.locmem.LocMemCache'
+
+CACHES = {
+    'default': {
+        'BACKEND': MEMORY_CACHE if DEBUG else MEMCACHED_CACHE,
+        'LOCATION': '127.0.0.1:11211'
+    }
+}
 
 from secrets import *
