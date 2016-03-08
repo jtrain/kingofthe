@@ -1,0 +1,15 @@
+<table>
+  <tr>
+    <th>Player</th>
+    <th>Score</th>
+    <th>&nbsp;</th>
+  </tr>
+{% for object in object_list %}
+  <tr class="{% if object.id == user.id %}highlighted{% endif %}">
+    <td>{{ object.first_name|default:object.username|cut:object.last_name }}</td>
+    <td>{{ object.num_hits }}</td>
+    <td>{% if object.id == user.id %}<span class="deemph">you!</span>&nbsp;{% endif %}{% if forloop.first %}&#x1F451;{% endif %}</td>
+  </tr>
+{% endfor %}
+</table>
+{% if iscached %}<span class="deemph">cached</span>{% endif %}

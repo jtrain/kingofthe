@@ -1,0 +1,4 @@
+{% load cache %}
+{% cache 1 highscores %}
+  {% include "_high_scores.html" %}
+{% endcache %}

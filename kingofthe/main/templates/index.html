@@ -1,0 +1,82 @@
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+  <style>
+    * {font-family: 'Yanone Kaffeesatz', 'helvetica', sans-serif; 
+       color:       #4E3F30;}
+
+    body { background: #FEFEEB; }
+    p {color: #0CA5B0;}
+    h1 { margin: 0; padding: 0.1em 0 0.2em 0; 
+         border-top: 2px solid #4E3F30; border-bottom: 3px solid #4E3F30;}
+    h1, p, table {text-align: center;}
+    table td {padding: 0.3em; }
+    .deemph { color: #A5B3AA; }
+    .heart {color: red;}
+    #highscores, .container {width: 600px; max-width: 90%; margin: 0 auto;}
+    .highlighted { background-color: #F8F4E4; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Its Reigning Monarchs</h1>
+  <p>Who are those people. Are they winning? <span class="deemph">Yes</span></p>
+  <p><span id="xhrps"></span></p>
+
+  <div id="highscores">
+    {% include "_high_scores.html" %}
+  </div>
+</div>
+<p class="deemph">made with <span class="heart">&hearts;</span></p>
+
+<script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+{% csrf_token %}
+{% include "_ajax.html" %}
+
+<script>
+var checkin_url = "{% url 'checkin' %}";
+var times = [];
+
+function spark(data) {
+  var chars = ["&#9601;", "&#9602;", "&#9603;", "&#9605;", "&#9606;", "&#9607;"]; 
+  var max = Math.max.apply(null, data);
+  var min = Math.min.apply(null, data);
+
+  var graph = [];
+  for (var i=0; i<data.length; i++) {
+    var chars_idx = Math.round((data[i] - min) / (max - min) * (chars.length - 1), 0);
+    graph.push(chars[chars_idx]);
+  }
+
+  return graph.join("");
+};
+
+function average(arr) {
+  var t = 0; for(var i=0;i<arr.length;i++){t+=arr[i]}; return t/arr.length;
+}
+
+function checkin(){
+  var start = new Date().getTime();
+
+  $.post(checkin_url)
+    .always(function(resp) {
+        // take the response data and render it on the page.
+        var diff = (new Date().getTime()) - start;
+        times.push(diff);
+        if (times.length>9){times.shift()};
+        var avg = average(times);
+        $("#highscores").html(resp.html);
+        var html = "<span class='deemph'>" + spark(times) + 
+                    " last " + diff + "ms | </span>avg " + avg.toFixed(0) + "ms";
+        $("#xhrps").html(html);
+        })
+};
+
+$(document).ready(function() {
+    setInterval(checkin, 1050);
+    });
+</script>
+
+</body>
+</html>
