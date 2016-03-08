@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = not os.path.exists(os.path.join(BASE_DIR, 'env-prod'))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = '*'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
