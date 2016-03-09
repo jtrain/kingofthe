@@ -1,3 +1,4 @@
+import time
 import uuid
 
 from django.conf import settings
@@ -48,13 +49,19 @@ class ToggleCacheView(View):
 class CheckinPingView(View):
 
     def post(self, request):
-        """
+        """get
         Create the checkin model for this person.
 
         Return a render of the highscores table.
         """
+        start = time.time()
         maybe_increment_hit.delay(self.request.user.id)
-        return JsonResponse({"html": self._render_template()}, status=201)
+        html = self._render_template()
+        end = time.time()
+        return JsonResponse({
+                             "html": html,
+                             "time": round((end - start)*1000, 0)
+                             }, status=201)
 
     def _render_template(self):
         hits = User.objects.annotate(num_hits=Count('checkinhit')

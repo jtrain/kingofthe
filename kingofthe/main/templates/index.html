@@ -57,18 +57,17 @@ function average(arr) {
 }
 
 function checkin(){
-  var start = new Date().getTime();
-
   $.post(checkin_url)
     .always(function(resp) {
         // take the response data and render it on the page.
-        var diff = (new Date().getTime()) - start;
-        times.push(diff);
+
+        times.push(resp.time);
         if (times.length>9){times.shift()};
         var avg = average(times);
+
         $("#highscores").html(resp.html);
         var html = "<span class='deemph'>" + spark(times) + 
-                    " last " + diff + "ms | </span>avg " + avg.toFixed(0) + "ms";
+                    " last " + resp.time + "ms | </span>avg " + avg.toFixed(0) + "ms";
         $("#xhrps").html(html);
         })
 };
