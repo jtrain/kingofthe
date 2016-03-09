@@ -135,4 +135,8 @@ CACHES = {
     }
 }
 
+CELERY_BROKER = "amqp://"
+CELERY_ALWAYS_EAGER = DEBUG
+CELERY_IGNORE_RESULT = True
+
 from secrets import *

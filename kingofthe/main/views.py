@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 
 from .forms import CheckinForm
 from .models import CheckinHit
+from .tasks import maybe_increment_hit
 
 class IndexView(ListView):
 
@@ -44,29 +45,15 @@ class ToggleCacheView(View):
         cache.set('iscached', iscached)
         return redirect('index')
 
-class CheckinPingView(FormView):
+class CheckinPingView(View):
 
-    form_class = CheckinForm
-
-    def get_form(self):
-        """
-        Inserts the user into the form
-        so the form has access to user.
-        """
-        form = super(CheckinPingView, self).get_form()
-        form.user = self.request.user
-        return form
-
-    def form_invalid(self, form):
-        return JsonResponse({"html": self._render_template()}, status=200)
-
-    def form_valid(self, form):
+    def post(self, request):
         """
         Create the checkin model for this person.
 
         Return a render of the highscores table.
         """
-        CheckinHit.objects.create(user=self.request.user)
+        maybe_increment_hit.delay(self.request.user.id)
         return JsonResponse({"html": self._render_template()}, status=201)
 
     def _render_template(self):
