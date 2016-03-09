@@ -28,9 +28,4 @@ urlpatterns = [
     url(r'^toggle$', main_views.ToggleCacheView.as_view(), name='toggle'), 
     url(r'^api/checkin$', login_required(main_views.CheckinPingView.as_view()),
         name='checkin'),
-
-    # fake accounts login sets up user account with "GET"
-    url(r'^accounts/login/$', main_views.NewAccount.as_view(),
-        name="accts_login"),
-
 ]

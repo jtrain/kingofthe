@@ -23,7 +23,18 @@ class IndexView(ListView):
 
     def get(self, request):
         if not self.request.user.is_authenticated():
-            return redirect('accts_login')
+
+            uname = slugify(request.META.get('HTTP_USER_AGENT'))[:110] # length 110
+            unique = uuid.uuid4().hex[:30] # length 30
+            # both less than 150 char max for username
+
+            user = User.objects.create_user(
+                username=uname+unique,
+                last_name=unique,
+                email='fake@example.com')
+
+            login_user(self.request, user)
+
         return super(IndexView, self).get(request)
 
 class ToggleCacheView(View):
@@ -71,25 +82,6 @@ class CheckinPingView(FormView):
         return render(self.request,
                       template_name,
                       {'object_list': hits, 'iscached': iscached}).content
-
-class NewAccount(View):
-    def get(self, request):
-        if request.user.is_authenticated():
-            return redirect('index')
-        
-
-        uname = slugify(request.META.get('HTTP_USER_AGENT'))[:110] # length 110
-        unique = uuid.uuid4().hex[:30] # length 30
-        # both less than 150 char max for username
-
-        user = User.objects.create_user(
-            username=uname+unique,
-            last_name=unique,
-            email='fake@example.com')
-
-        login_user(self.request, user)
-
-        return redirect('index')
 
 def login_user(request, user):
     from django.contrib.auth import load_backend, login
